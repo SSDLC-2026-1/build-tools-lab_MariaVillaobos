@@ -312,3 +312,8 @@ ant package
 # Bonus Challenge (Optional)
 
 Modify the `package` target so that the generated `report.txt` file is included in the final `.zip` package.
+
+g++ -Wall -Wextra -std=c++17 -c src/main.cpp -o bin/main.o
+g++ -Wall -Wextra -std=c++17 -c src/ticket.cpp -o bin/ticket.o
+g++ -Wall -Wextra -std=c++17 -c src/validator.cpp -o bin/validator.o
+g++ bin/main.o bin/ticket.o bin/validator.o -o bin/ticket_validator
