@@ -1,21 +1,38 @@
-import json
-from validator import validate_attendee
+import re
 
-with open("data/attendees.json", "r", encoding="utf-8") as f:
-    attendees = json.load(f)
+VALID_TICKETS = {"general", "vip", "student"}
 
-valid_count = 0
-invalid_count = 0
+def is_valid_email(email: str) -> bool:
+    pattern = r"^[^@\s]+@[^@\s]+\.[^@\s]+$"
+    return re.match(pattern, email) is not None
 
-for attendee in attendees:
-    errors = validate_attendee(attendee)
-    if errors:
-        invalid_count += 1
-        print(f"[INVALID] {attendee.get('name', 'Unknown')}: {errors}")
-    else:
-        valid_count += 1
-        print(f"[VALID] {attendee['name']}")
+def is_valid_registration_code(code: str) -> bool:
+    """Validate registration code format: EV- followed by exactly 4 digits"""
+    if not code or not isinstance(code, str):
+        return False
+    pattern = r"^EV-\d{4}$"
+    return re.match(pattern, code) is not None
 
-print("\nSummary")
-print(f"Valid attendees: {valid_count}")
-print(f"Invalid attendees: {invalid_count}")
+def validate_attendee(attendee: dict) -> list:
+    errors = []
+
+    if not attendee.get("name") or not attendee["name"].strip():
+        errors.append("Invalid name")
+
+    if not is_valid_email(attendee.get("email", "")):
+        errors.append("Invalid email")
+
+    age = attendee.get("age")
+    if not isinstance(age, int) or age < 18:
+        errors.append("Attendee must be 18 or older")
+
+    if attendee.get("ticket_type") not in VALID_TICKETS:
+        errors.append("Invalid ticket type")
+    
+    # New validation for registration code
+    reg_code = attendee.get("registration_code")
+    if reg_code is not None:  # Only validate if provided
+        if not is_valid_registration_code(reg_code):
+            errors.append("Invalid registration code format (must be EV- followed by 4 digits)")
+
+    return errors
