@@ -27,6 +27,17 @@
         </exec>
     </target>
 
+    <target name="report">
+        <echo>Generating validation report...</echo>
+        <!-- Create dist directory if it doesn't exist -->
+        <mkdir dir="${dist.dir}"/>
+        <!-- Run the application and save output to report.txt -->
+        <exec executable="python3" failonerror="true" output="${dist.dir}/report.txt">
+            <arg value="${src.dir}/app.py"/>
+        </exec>
+        <echo>Report saved to ${dist.dir}/report.txt</echo>
+    </target>
+
     <target name="package" depends="clean,test">
         <echo>Packaging project...</echo>
         <exec executable="zip" failonerror="true">
